@@ -1,40 +1,20 @@
+require("dotenv").config();
 const express = require("express");
-const multer = require("multer");
-const axios = require("axios");
 const cors = require("cors");
-const fs = require("fs");
-const FormData = require("form-data");
+const mongoose = require("mongoose");
+const ocrRoutes = require("./routes/ocrRoutes");
 
 const app = express();
-app.use(cors());  // Autorise les requêtes depuis le frontend
+app.use(cors());
+app.use(express.json());
 
-const upload = multer({ dest: "uploads/" }); // Dossier temporaire
+// Connexion à MongoDB
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log("✅ Connecté à MongoDB"))
+    .catch((err) => console.error("Erreur de connexion MongoDB :", err));
 
-app.post("/upload", upload.single("file"), async (req, res) => {
-    try {
-        const file = req.file;
-        if (!file) {
-            return res.status(400).json({ error: "Aucun fichier envoyé." });
-        }
-
-        // Lire le fichier depuis le disque
-        const formData = new FormData();
-        formData.append("file", fs.createReadStream(file.path), file.originalname);
-
-        // Envoyer le fichier à l'API Python (OCR)
-        const response = await axios.post("http://127.0.0.1:5001/ocr", formData, {
-            headers: { ...formData.getHeaders() },
-        });
-
-        // Supprimer le fichier après envoi
-        fs.unlinkSync(file.path);
-
-        res.json({ text: response.data.text });
-    } catch (error) {
-        console.error("Erreur OCR :", error);
-        res.status(500).json({ error: "Erreur de traitement OCR" });
-    }
-});
+// Routes
+app.use("/api", ocrRoutes);
 
 app.listen(5000, () => {
     console.log("✅ API Node.js en écoute sur http://localhost:5000");

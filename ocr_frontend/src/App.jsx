@@ -18,10 +18,11 @@ function App() {
 
     const formData = new FormData();
     formData.append("file", file);
-
+    
+    /* on set Loading a true pour afficher le spinner loading*/
     setLoading(true);
     try {
-      const response = await axios.post("http://localhost:5000/upload", formData);
+      const response = await axios.post("http://localhost:5000/api/upload", formData);
       setText(response.data.text);
     } catch (error) {
       console.error("Erreur OCR :", error);
@@ -41,7 +42,7 @@ function App() {
           onChange={handleFileChange}
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none mb-4"
         />
-
+      
         <button
           onClick={handleUpload}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center justify-center"
