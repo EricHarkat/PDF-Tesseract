@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 function App() {
   const [file, setFile] = useState(null);
   const [text, setText] = useState("");
   const [loading, setLoading] = useState(false);
+  const [history, setHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -18,17 +20,30 @@ function App() {
 
     const formData = new FormData();
     formData.append("file", file);
-    
-    /* on set Loading a true pour afficher le spinner loading*/
+
     setLoading(true);
     try {
       const response = await axios.post("http://localhost:5000/api/upload", formData);
       setText(response.data.text);
+      fetchHistory(); // Met à jour l'historique après upload
     } catch (error) {
       console.error("Erreur OCR :", error);
     }
     setLoading(false);
   };
+
+  const fetchHistory = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/history");
+      setHistory(response.data);
+    } catch (error) {
+      console.error("Erreur de récupération de l'historique :", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchHistory();
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-6">
@@ -42,7 +57,7 @@ function App() {
           onChange={handleFileChange}
           className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none mb-4"
         />
-      
+
         <button
           onClick={handleUpload}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition duration-300 flex items-center justify-center"
@@ -83,6 +98,32 @@ function App() {
             {text || "Aucun texte extrait pour l'instant."}
           </pre>
         </div>
+
+        {/* Bouton pour afficher l'historique */}
+        <button
+          onClick={() => setShowHistory(!showHistory)}
+          className="mt-4 w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded transition duration-300"
+        >
+          {showHistory ? "Masquer l'historique" : "Afficher l'historique"}
+        </button>
+
+        {/* Historique des fichiers analysés */}
+        {showHistory && (
+          <div className="mt-4 bg-gray-100 p-4 rounded shadow-inner max-h-60 overflow-auto">
+            <h3 className="text-lg font-semibold text-gray-700">Historique des analyses :</h3>
+            {history.length > 0 ? (
+              history.map((item) => (
+                <div key={item._id} className="border-b border-gray-300 py-2">
+                  <p className="text-sm font-bold text-blue-600">{item.filename}</p>
+                  <p className="text-xs text-gray-600">{new Date(item.date).toLocaleString()}</p>
+                  <pre className="text-xs text-gray-800 bg-white p-2 rounded mt-1">{item.text}</pre>
+                </div>
+              ))
+            ) : (
+              <p className="text-gray-500">Aucun historique pour l'instant.</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
