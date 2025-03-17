@@ -41,8 +41,8 @@ J'ai créé le service OCR en Python, bien que j'aurais pu l'implémenter direct
 
 ### 1️⃣ **Cloner le projet**
 ```bash
-git clone https://github.com/ton-github/ocr_project.git
-cd ocr_project
+git clone https://github.com/EricHarkat/PDF-Tesseract.git
+cd PDF-Tesseract
 ```
 
 ### 2️⃣ **Backend (Node.js)**
