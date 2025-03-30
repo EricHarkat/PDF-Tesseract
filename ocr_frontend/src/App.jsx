@@ -41,6 +41,16 @@ function App() {
     }
   };
 
+  const deleteHistoryItem = async (id) => {
+    try {
+        await axios.delete(`http://localhost:5000/api/history/${id}`);
+        console.log(`document supprimé:${id}`)
+        setHistory(history.filter(item => item._id !== id)); // Mettre à jour la liste après suppression
+    } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+    }
+};
+
   useEffect(() => {
     fetchHistory();
   }, []);
@@ -114,10 +124,19 @@ function App() {
             {history.length > 0 ? (
               history.map((item) => (
                 <div key={item._id} className="border-b border-gray-300 py-2">
-                  <p className="text-sm font-bold text-blue-600">{item.filename}</p>
-                  <p className="text-xs text-gray-600">{new Date(item.date).toLocaleString()}</p>
-                  <pre className="text-xs text-gray-800 bg-white p-2 rounded mt-1">{item.text}</pre>
+                  <div>
+                    <p className="text-sm font-bold text-blue-600">{item.filename}</p>
+                    <p className="text-xs text-gray-600">{new Date(item.date).toLocaleString()}</p>
+                    <pre className="text-xs text-gray-800 bg-white p-2 rounded mt-1">{item.text}</pre>
+                  </div>
+                  <button
+                        onClick={() => deleteHistoryItem(item._id)}
+                        className="ml-4 bg-red-600 hover:bg-red-700 text-white text-xs font-bold py-1 px-3 rounded transition duration-300"
+                    >
+                        🗑 Supprimer
+                    </button>
                 </div>
+                
               ))
             ) : (
               <p className="text-gray-500">Aucun historique pour l'instant.</p>

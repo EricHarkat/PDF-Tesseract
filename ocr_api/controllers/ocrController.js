@@ -43,4 +43,15 @@ const getHistory = async (req, res) => {
     }
 };
 
-module.exports = { uploadFile, getHistory };
+const deleteHistory = async (req, res) => {
+    try {
+        const {id} = req.params;
+        await OcrResult.findByIdAndDelete(id)
+        res.json({ message: "Entrée supprimée avec succès" });
+    } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+        res.status(500).json({ error: "Impossible de supprimer l'entrée" });
+    }
+}
+
+module.exports = { uploadFile, getHistory, deleteHistory };
