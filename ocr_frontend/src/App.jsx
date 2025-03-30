@@ -51,6 +51,16 @@ function App() {
     }
 };
 
+const clearHistory = async () => {
+  try {
+      await axios.delete("http://localhost:5000/api/history");
+      setHistory([]); // Vide l'historique côté client
+      console.log("Histroique vidé")
+  } catch (error) {
+      console.error("Erreur lors de la suppression complète :", error);
+  }
+};
+
   useEffect(() => {
     fetchHistory();
   }, []);
@@ -116,6 +126,15 @@ function App() {
         >
           {showHistory ? "Masquer l'historique" : "Afficher l'historique"}
         </button>
+        {/* Bouton "Vider l’historique" */}
+        {history.length > 0 && (
+            <button
+                onClick={clearHistory}
+                className="mt-3 bg-red-700 hover:bg-red-800 text-white font-bold py-2 px-4 rounded transition duration-300 w-full"
+            >
+                🗑 Vider l’historique
+            </button>
+        )}
 
         {/* Historique des fichiers analysés */}
         {showHistory && (
@@ -136,7 +155,6 @@ function App() {
                         🗑 Supprimer
                     </button>
                 </div>
-                
               ))
             ) : (
               <p className="text-gray-500">Aucun historique pour l'instant.</p>

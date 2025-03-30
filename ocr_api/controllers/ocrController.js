@@ -54,4 +54,14 @@ const deleteHistory = async (req, res) => {
     }
 }
 
-module.exports = { uploadFile, getHistory, deleteHistory };
+const deleteAllHistory = async (req, res) => {
+    try {
+        await OcrResult.deleteMany({});
+        res.json({ message: "Historique supprimé avec succès" });
+    } catch (error) {
+        console.error("Erreur lors de la suppression complète :", error);
+        res.status(500).json({ error: "Impossible de supprimer l'historique" });
+    }
+}
+
+module.exports = { uploadFile, getHistory, deleteHistory, deleteAllHistory };
